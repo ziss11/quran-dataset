@@ -73,12 +73,40 @@ def build_verses():
     return {'verses': new_verses}
 
 
+def build_juz():
+    juz_path = 'old/juz.json'
+    surah_path = 'data/new_surah.json'
+
+    juz_json = load_json(juz_path)
+    surah_json = load_json(surah_path)
+
+    new_juz = list()
+
+    for juz in juz_json:
+        start = int(juz['start']['index'])
+        end = int(juz['end']['index'])
+
+        selected_surah = [
+            surah for surah in surah_json['surah'] if surah['id'] in range(start, end+1)]
+
+        juz_model = {'id': int(juz['index']),
+                     'surah': selected_surah}
+
+        new_juz.append(juz_model)
+
+    return {'juz': new_juz}
+
+
 if __name__ == '__main__':
+    juz = build_juz()
     surah = build_surah()
     verses = build_verses()
 
-    with codecs.open('new/new_surah.json', 'w', 'utf-8') as f:
+    with codecs.open('data/new_juz.json', 'w', 'utf-8') as f:
+        f.write(json.dumps(juz, ensure_ascii=False))
+
+    with codecs.open('data/new_surah.json', 'w', 'utf-8') as f:
         f.write(json.dumps(surah, ensure_ascii=False))
 
-    with codecs.open('new/new_verse.json', 'w', 'utf-8') as f:
+    with codecs.open('data/new_verse.json', 'w', 'utf-8') as f:
         f.write(json.dumps(verses, ensure_ascii=False))
